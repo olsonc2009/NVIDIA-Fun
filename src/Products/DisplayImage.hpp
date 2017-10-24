@@ -7,7 +7,6 @@
 #include <boost/property_tree/ptree.hpp>
 
 /// \brief Reference implementation to display an image to the screen using WindowManagerGLFW
-/// \todo Add validation for tree settings
 class DisplayImage
 {
 
@@ -32,11 +31,23 @@ public:
 
 private:
 
-  static bool validatePropTree( const boost::property_tree::ptree& inputTree );
+  bool validatePropTree(
+                        const boost::property_tree::ptree& inputTree,
+                        bool extractParameters
+                        );
+
+  bool loadImage();
 
   boost::property_tree::ptree inputTree_;
+  std::vector< std::string >  inputKeys_;
 
-  std::vector< std::string > inputKeys_;
+  unsigned int windowHeight_;
+  unsigned int windowWidth_;
+  std::string  imageFilename_;
+  std::string  fileType_;
+  bool         useImageSizeForWindowSize_;
+
+  std::vector< unsigned char > image_;
 
 };
 

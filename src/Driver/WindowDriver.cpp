@@ -70,6 +70,7 @@ int main( int argc, char* argv[] )
   {
 
     std::cout << "Did not succesfully render image or exited with bad code" << std::endl;
+    return -1;
 
   }
   else
