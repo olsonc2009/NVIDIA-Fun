@@ -6,6 +6,7 @@
 #include "gtest/gtest.h"
 
 #include "glad/glad.h"
+#include "GLFW/glfw3.h"
 #include "utility.hpp"
 
 #include "GraphicsContextGLFW.hpp"
