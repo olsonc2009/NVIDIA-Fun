@@ -17,7 +17,8 @@ include_directories(
 	                ${UTIL_DIR}
 	                )
 
-add_library( ${ENGINE_TGT} ${ENGINE_SRC} )
+add_library( ${ENGINE_TGT} SHARED ${ENGINE_SRC} )
+target_link_libraries( ${ENGINE_TGT} glfw ${UTIL_TGT} )
 add_dependencies( ${ENGINE_TGT} ${GLAD_TGT} ${UTIL_TGT} )
 
 set( ENGINE_TGT ${ENGINE_TGT} PARENT_SCOPE )
