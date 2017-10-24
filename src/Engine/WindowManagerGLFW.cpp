@@ -1,5 +1,9 @@
 #include "WindowManagerGLFW.hpp"
 
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
+
+
 /// \brief Constructor, does nothing until initialize
 WindowManagerGLFW::WindowManagerGLFW( WindowRendererOGL* pWinRenderer )
   : nextWindowID_( 0 )

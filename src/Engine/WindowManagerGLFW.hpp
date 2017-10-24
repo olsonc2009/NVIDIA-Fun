@@ -4,10 +4,9 @@
 #include <map>
 #include <string>
 
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
-
 class WindowRendererOGL;
+
+struct GLFWwindow;
 
 ///
 /// \brief WindowManagerGLFW assumes that there is already a valid context
