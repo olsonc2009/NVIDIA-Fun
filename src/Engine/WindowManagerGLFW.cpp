@@ -3,10 +3,13 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 
+#include "GraphicsContextGLFW.hpp"
+
 
 /// \brief Constructor, does nothing until initialize
-WindowManagerGLFW::WindowManagerGLFW( WindowRendererOGL* pWinRenderer )
+WindowManagerGLFW::WindowManagerGLFW( GraphicsContextGLFW* pGraphicsContext )
   : nextWindowID_( 0 )
+  , pGraphicsContext_( pGraphicsContext )
 {
 
 }
@@ -37,6 +40,25 @@ WindowManagerGLFW::createWindow(
                                 )
 {
 
+  // If a graphics context wasn't passed in create one
+  if( pGraphicsContext_ == 0 )
+  {
+
+    pGraphicsContext_ = new GraphicsContextGLFW();
+
+  }
+
+  //
+  // Check if our graphics context has been initialized
+  //
+  if( !pGraphicsContext_->isInitialized() )
+  {
+
+    pGraphicsContext_->initialize();
+
+  }
+
+
   glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, openGlMajorVersion );
   glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, openGlMinorVersion );
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -58,7 +80,12 @@ WindowManagerGLFW::createWindow(
     idToWindowMap_[ nextWindowID_ ] = pWindow;
     retID = nextWindowID_;
 
-    pRetWin = pWindow;
+    if( &pRetWin != 0 )
+    {
+
+      pRetWin = pWindow;
+
+    }
 
     //
     // Increment our ID to the next one
@@ -69,9 +96,9 @@ WindowManagerGLFW::createWindow(
     // Set the swap interval to 0 so we render as fast as possible
     //
     if( this->grabWindow( retID ) )
-      {
-        glfwSwapInterval( 0 );
-      }
+    {
+      glfwSwapInterval( 0 );
+    }
 
     return true;
 

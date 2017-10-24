@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 
-class WindowRendererOGL;
+class GraphicsContextGLFW;
 
 struct GLFWwindow;
 
@@ -17,7 +17,7 @@ class WindowManagerGLFW
 
 public:
 
-  WindowManagerGLFW( WindowRendererOGL* pWinRenderer = 0 );
+  WindowManagerGLFW( GraphicsContextGLFW* pGraphicsContext = 0 );
 
   virtual ~WindowManagerGLFW();
 
@@ -50,12 +50,13 @@ public:
   /// \brief get the window, returns null if it doesn't exist
   GLFWwindow* getWindow( size_t windowIdx );
 
+
 protected:
 
   std::map< size_t, GLFWwindow* > idToWindowMap_;
   size_t nextWindowID_;
 
-  WindowRendererOGL *pWinRenderer_;
+  GraphicsContextGLFW *pGraphicsContext_;
 
 };
 

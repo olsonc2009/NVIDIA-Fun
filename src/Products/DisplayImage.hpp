@@ -6,6 +6,16 @@
 
 #include <boost/property_tree/ptree.hpp>
 
+class ModelPackage;
+class RenderableOGL;
+class RendererOGL;
+class WindowManagerGLFW;
+class GraphicsContextGLFW;
+
+/// \todo Get rid of this
+struct GLFWwindow;
+
+
 /// \brief Reference implementation to display an image to the screen using WindowManagerGLFW
 class DisplayImage
 {
@@ -37,17 +47,31 @@ private:
                         );
 
   bool loadImage();
+  bool setupModelPackage();
+  bool setupWindowForDisplay();
+  bool renderLoop();
 
   boost::property_tree::ptree inputTree_;
   std::vector< std::string >  inputKeys_;
 
   unsigned int windowHeight_;
   unsigned int windowWidth_;
+  unsigned int imageChannels_;
   std::string  imageFilename_;
   std::string  fileType_;
   bool         useImageSizeForWindowSize_;
 
   std::vector< unsigned char > image_;
+
+  RendererOGL*         pRenderer_;
+  ModelPackage*        pModelPackage_;
+  RenderableOGL*       pRenderableOGL_;
+  WindowManagerGLFW*   pWindowManager_;
+  GraphicsContextGLFW* pGraphicsContext_;
+  GLFWwindow*          pWin_;
+
+  size_t renderableIdx_;
+  size_t windowIdx_;
 
 };
 

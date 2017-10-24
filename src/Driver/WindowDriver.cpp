@@ -181,6 +181,15 @@ void parseArgs( int argc, char* argv[] )
                   );
 
   }
+  else
+  {
+
+    propTree_.put(
+                  "windowWidth",
+                  0
+                 );
+
+  }
 
   if( vm.find( "windowHeight" ) != vm.end() )
   {
@@ -190,6 +199,16 @@ void parseArgs( int argc, char* argv[] )
                   vm[ "windowHeight" ].as< unsigned int >()
                   );
   }
+  else
+  {
+
+    propTree_.put(
+                  "windowHeight",
+                  0
+                 );
+
+  }
+
 
   if( vm.find( "fileType" ) != vm.end() )
   {

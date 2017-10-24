@@ -116,4 +116,59 @@ namespace utility
 
   }
 
+
+  bool generateScreenModelPackage(
+                                  std::vector< float >& vertexPosVec,
+                                  std::vector< float >& texCoords,
+                                  std::vector< unsigned int >& indices
+                                  )
+  {
+
+    vertexPosVec.clear();
+    texCoords   .clear();
+    indices     .clear();
+
+    //
+    // 4 points of the square
+    //
+
+    // Point 0
+    vertexPosVec.push_back( -1.0f );
+    vertexPosVec.push_back( -1.0f );
+    vertexPosVec.push_back( 0.0f );
+    texCoords   .push_back( 0.0f );
+    texCoords   .push_back( 0.0f );
+
+    // Point 1
+    vertexPosVec.push_back( -1.0f );
+    vertexPosVec.push_back( 1.0f );
+    vertexPosVec.push_back( 0.0f );
+    texCoords   .push_back( 0.0f );
+    texCoords   .push_back( 1.0f );
+
+    // Point 2
+    vertexPosVec.push_back( 1.0f );
+    vertexPosVec.push_back( 1.0f );
+    vertexPosVec.push_back( 0.0f );
+    texCoords   .push_back( 1.0f );
+    texCoords   .push_back( 1.0f );
+
+    // Point 3
+    vertexPosVec.push_back( 1.0f );
+    vertexPosVec.push_back( -1.0f );
+    vertexPosVec.push_back( 0.0f );
+    texCoords   .push_back( 1.0f );
+    texCoords   .push_back( 0.0f );
+
+    // Indices for drawing triangles
+    indices.push_back( 0 );
+    indices.push_back( 2 );
+    indices.push_back( 1 );
+    indices.push_back( 0 );
+    indices.push_back( 3 );
+    indices.push_back( 2 );
+
+  }
+
+
 };

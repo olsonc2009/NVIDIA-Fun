@@ -7,6 +7,7 @@ include_directories(
 					${ENGINE_DIR} 
 					${Boost_INCLUDE_DIRS}
 					${PRODUCT_DIR}
+					${UTIL_DIR}
 					)
 
 
@@ -29,7 +30,7 @@ target_link_libraries(
 					  ${DISPLAY_TGT} 
 					  )
 
-add_dependencies( WinManager ${ENGINE_TGT} ${GLAD_TGT} ${DISPLAY_TGT} )
+add_dependencies( WinManager ${ENGINE_TGT} ${GLAD_TGT} ${DISPLAY_TGT} ${ENGINE_TGT} )
 
 #
 # Install paths

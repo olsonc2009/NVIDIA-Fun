@@ -5,6 +5,17 @@
 #include <boost/gil/gil_all.hpp>
 #include <boost/gil/extension/io/png_io.hpp>
 
+
+#include "RendererOGL.hpp"
+#include "ModelPackage.hpp"
+#include "RenderableOGL.hpp"
+#include "WindowManagerGLFW.hpp"
+#include "GraphicsContextGLFW.hpp"
+#include "utility.hpp"
+
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
+
 // CPP only namespace shortcut(s)
 namespace pt = boost::property_tree;
 
@@ -16,15 +27,20 @@ struct PixelInserter
 
   void operator()(boost::gil::rgb8_pixel_t p) const
   {
-          storage->push_back(boost::gil::at_c<0>(p));
-          storage->push_back(boost::gil::at_c<1>(p));
-          storage->push_back(boost::gil::at_c<2>(p));
+    storage->push_back(boost::gil::at_c<0>(p));
+    storage->push_back(boost::gil::at_c<1>(p));
+    storage->push_back(boost::gil::at_c<2>(p));
   }
 
 };
 
 /// \brief Ctor, calls reset
 DisplayImage::DisplayImage()
+  : pRenderer_        ( 0 )
+  , pModelPackage_    ( 0 )
+  , pRenderableOGL_   ( 0 )
+  , pWindowManager_   ( 0 )
+  , pGraphicsContext_ ( 0 )
 {
 
   reset();
@@ -87,7 +103,49 @@ DisplayImage::reset()
   inputKeys_.push_back( "windowHeight" );
   inputKeys_.push_back( "fileType"     );
 
+  if( pRenderer_      == 0 )
+  {
 
+    delete pRenderer_;
+    pRenderer_ = 0;
+
+  }
+
+
+  if( pModelPackage_  == 0 )
+  {
+
+    delete pModelPackage_;
+    pModelPackage_ = 0;
+
+  }
+
+
+  if( pRenderableOGL_ == 0 )
+  {
+
+    delete pRenderableOGL_;
+    pRenderableOGL_ = 0;
+
+  }
+
+  if( pWindowManager_ == 0 )
+  {
+
+    delete pWindowManager_;
+    pWindowManager_ = 0;
+
+  }
+
+  if( pGraphicsContext_ )
+  {
+
+    delete pGraphicsContext_;
+    pGraphicsContext_ = 0;
+
+  }
+
+  renderableIdx_ = 0;
 
 }
 
@@ -110,13 +168,125 @@ DisplayImage::displayImage()
 
   }
 
+  //
   // Load the image from the file into memory
-  loadImage();
+  //
+  success = loadImage();
 
-  // Do something with the image
+  // Check for errors
+  if( !success )
+  {
+
+    std::cerr << "Could not load image" << std::endl;
+    return false;
+
+  }
+  else
+  {
+
+    std::cout << "Successfully loaded the image" << std::endl;
+
+  }
+
+
+  //
+  // Setup the window for display
+  //
+  success = setupWindowForDisplay();
+
+  if( !success )
+  {
+
+    std::cerr << "Could not set up the window for display" << std::endl;
+    return false;
+
+  }
+  else
+  {
+
+    std::cout << "Successfully setup the window for display" << std::endl;
+
+  }
+
+
+
+  //
+  // Setup the model package
+  //
+  success = setupModelPackage();
+
+  if( !success )
+  {
+
+    std::cerr << "Could not set up the model package" << std::endl;
+    return false;
+
+  }
+  else
+  {
+
+    std::cout << "Successfully setup the model package" << std::endl;
+
+  }
+
+  //
+  // Call the render loop
+  //
+  renderLoop();
 
   // For now return false
-  return false;
+  return true;
+
+}
+
+
+/// \brief The render loop
+bool
+DisplayImage::renderLoop()
+{
+
+  glClearColor( 0.0f, 0.0f, 0.4f, 0.0f );
+  glViewport( 0, 0, windowWidth_, windowHeight_ );
+  // Do the rendeiring for now in a loop
+  do
+  {
+
+    glClear( GL_COLOR_BUFFER_BIT );
+    //glViewport( 0, 0, 640, 480 );
+
+    pRenderer_->renderId( renderableIdx_ );
+
+    //
+    // Blit from the framebuffer to the screen
+    //
+    // glBindFramebuffer(
+    //                   GL_READ_FRAMEBUFFER,
+    //                   fbo
+    //                   );
+
+    // glBindFramebuffer(
+    //                   GL_DRAW_FRAMEBUFFER,
+    //                   0
+    //                   );
+
+    // glBlitFramebuffer(
+    //                   0, 0, 640, 480,
+    //                   0, 0, 640, 480,
+    //                   GL_COLOR_BUFFER_BIT,
+    //                   GL_LINEAR
+    //                   );
+
+    // Swap buffers
+    pWindowManager_->swapBuffers( windowIdx_ );
+
+    //glfwSwapBuffers( pWin_ );
+    glfwPollEvents();
+
+  }
+  while(
+        glfwGetKey( pWin_, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
+        glfwWindowShouldClose( pWin_ ) == 0
+        );
 
 }
 
@@ -124,6 +294,7 @@ DisplayImage::displayImage()
 
 /// \brief Load the image that was set from inputTree_, return true if succesfull.
 /// \todo Implement custom file loader
+/// \todo Move this to an algorithm type pattern for testing
 ///        For now we only support PNG through boost, eventually a loader for a custom format will be made
 bool
 DisplayImage::loadImage()
@@ -137,36 +308,177 @@ DisplayImage::loadImage()
 
   std::cout << "Width, Height, Channels = " << image.width() << ", " << image.height() << ", " << boost::gil::num_channels< boost::gil::rgb8_image_t >() << std::endl;
 
+  if( useImageSizeForWindowSize_ )
+  {
+
+    windowWidth_   = image.width();
+    windowHeight_  = image.height();
+    imageChannels_ = 3; //boost::gil::num_channels< boost::gil::rgb8_image_t >();
+
+  }
+
   //boost::gil::const_view( image );
 
-  image_.reserve( image.width() * image.height() * boost::gil::num_channels< boost::gil::rgb8_image_t >() );
+  image_.resize( image.width() * image.height() * boost::gil::num_channels< boost::gil::rgb8_image_t >() );
 
   // For each pixel insert into a storage bin
-  boost::gil::for_each_pixel(
-                             boost::gil::const_view( image ),
-                             PixelInserter( &image_ )
-                             );
+  // boost::gil::for_each_pixel(
+  //                            boost::gil::const_view( image ),
+  //                            PixelInserter( &image_ )
+  //                            );
 
   // Loop over all of the pixels in the image and push them into a vector
   // for( size_t row = 0; row < image.height(); ++row )
   // {
 
-  //   for( size_t col = 0; col < image.width(); ++col )
-  //   {
+    for( size_t col = 0; col < image.width(); ++col )
+    {
 
-  //     std::cout << ( unsigned int )image_[ ( row * image.width() + col ) * 3 + 2 ] << ", ";
+      //std::cout << ( unsigned int )image_[ ( row * image.width() + col ) * 3 + 2 ] << ", ";
+      // image_[ ( image.width() / 2 * image.height() + col ) * 3 + 0 ] = 0;
+      // image_[ ( image.width() / 2 * image.height() + col ) * 3 + 1 ] = 0;
+      // image_[ ( image.width() / 2 * image.height() + col ) * 3 + 2 ] = 1;
 
-  //   }
+      image_[ ( image.height() / 2 * image.width() + col ) * 3 + 0 ] = 0;
+      image_[ ( image.height() / 2 * image.width() + col ) * 3 + 1 ] = 0;
+      image_[ ( image.height() / 2 * image.width() + col ) * 3 + 2 ] = 1;
 
-  //   std::cout << std::endl;
+    }
 
   // }
 
-  return false;
+  return true;
 
 }
 
 
+/// \brief Get the window setup now that all of the internal vars have been set
+bool
+DisplayImage::setupWindowForDisplay()
+{
+
+
+
+  pGraphicsContext_ = new GraphicsContextGLFW();
+  pRenderer_        = new RendererOGL();
+  pWindowManager_   = new WindowManagerGLFW( pGraphicsContext_ );
+
+  bool success( false );
+
+  success = pGraphicsContext_->initialize();
+
+  if( !success )
+  {
+
+    return false;
+
+  }
+
+
+  success = pWindowManager_->createWindow(
+                                          windowIdx_,
+                                          pWin_,
+                                          windowWidth_,
+                                          windowHeight_,
+                                          "DisplayImage"
+                                          );
+
+  if( !success )
+  {
+    return false;
+  }
+
+
+  success = pGraphicsContext_->loadExtensions();
+
+  if( !success )
+  {
+
+    return false;
+
+  }
+
+  return success;
+
+}
+
+
+
+/// \brief Given everything that is loaded into the class memory setup a Model Package for rendering
+bool
+DisplayImage::setupModelPackage()
+{
+
+  bool ret( false );
+
+  pModelPackage_  = new ModelPackage();
+
+  pRenderableOGL_ = new RenderableOGL();
+
+  std::vector< float >        vertexPosVec;
+  std::vector< float >        texCoords;
+  std::vector< unsigned int > indices;
+  std::vector< unsigned int > imageSizeVec;
+  std::vector< std::string >  shaderFilenames;
+
+  // Generate what we can for the render package
+  utility::generateScreenModelPackage(
+                                      vertexPosVec,
+                                      texCoords,
+                                      indices
+                                      );
+
+  // Create the necessary vector for imageSizeVec
+  imageSizeVec.push_back( windowWidth_ );
+  imageSizeVec.push_back( windowHeight_ );
+
+  // Add the geometry
+  pModelPackage_->addGeometry( vertexPosVec );
+
+  // Add the texture to the package
+  pModelPackage_->addTexture(
+                             image_,
+                             texCoords,
+                             imageSizeVec,
+                             imageChannels_
+                             );
+
+  // Add the indices to the package
+  pModelPackage_->addIndices( indices );
+
+  shaderFilenames.push_back( "../src/UnitTests/testTexVert.glsl" );
+  shaderFilenames.push_back( "../src/UnitTests/testTexFrag.glsl" );
+
+  //
+  // Add the shaders to the render package
+  //
+  ret = pModelPackage_->addRendererFilenames( shaderFilenames );
+
+  // Return if bad
+  if( !ret )
+  {
+
+    return ret;
+
+  }
+
+  //
+  // Create the renderable
+  //
+  ret = pRenderer_->initializeRenderable( *pModelPackage_, renderableIdx_ );
+
+  // Return if bad
+  if( !ret )
+  {
+
+    return ret;
+
+  }
+
+
+  return true;
+
+}
 
 /// \brief Set the inputs using an input tree, validate the inputs before we copy to the internals
 bool
@@ -258,7 +570,7 @@ DisplayImage::validatePropTree(
       if( extractParameters )
       {
 
-        windowHeight_ = inputTree.get< unsigned int >( "windowWidth" );
+        windowWidth_ = inputTree.get< unsigned int >( "windowWidth" );
 
         if( windowHeight_ == 0 )
         {

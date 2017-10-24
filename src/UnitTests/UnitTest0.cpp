@@ -174,7 +174,7 @@ TEST( UnitTest0, RenderTexture )
 {
 
   GraphicsContextGLFW context;
-  WindowManagerGLFW winManager;
+  WindowManagerGLFW winManager( &context );
   RendererOGL renderer;
   ModelPackage modelPackage;
 
@@ -207,8 +207,8 @@ TEST( UnitTest0, RenderTexture )
   //
   // INITIALIZE
   //
-  unsigned int renderHeight( 640 );
-  unsigned int renderWidth( 480 );
+  unsigned int renderWidth( 640 );
+  unsigned int renderHeight( 480 );
 
   unsigned int fbo( 0 );
   unsigned int fboTex( 0 );
@@ -218,19 +218,20 @@ TEST( UnitTest0, RenderTexture )
   unsigned int renderBuffer( 0 );
 
   // Generate the texture to render
-  std::vector< float > testTexture( renderHeight * renderWidth * 4 );
+  std::vector< float > testTexture( renderHeight * renderWidth * 3 );
 
-  //for( size_t hIdx = 0; hIdx < renderHeight; ++hIdx )
+  for( size_t hIdx = 0; hIdx < renderHeight; ++hIdx )
   {
 
-    for( size_t wIdx = 0; wIdx < renderWidth; ++wIdx )
+    //for( size_t wIdx = 0; wIdx < renderWidth; ++wIdx )
     {
 
-      testTexture[ ( renderHeight / 2 * renderWidth + wIdx ) * 4 ] = 1;
+      testTexture[ ( hIdx * renderWidth + renderWidth / 2 ) * 3 + 2 ] = 1;
 
     }
 
   }
+
   //
   // Generate and bind the fbo
   //

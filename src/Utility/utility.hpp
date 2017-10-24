@@ -28,6 +28,12 @@ namespace utility
                           std::string& outputString
                           );
 
+  bool generateScreenModelPackage(
+                                 std::vector< float >& vertexPosVec,
+                                 std::vector< float >& texCoords,
+                                 std::vector< unsigned int >& indices
+                                 );
+
 };
 
 #endif
