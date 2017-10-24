@@ -92,3 +92,21 @@ GraphicsContextGLFW::isInitialized()
   return initialized_;
 
 }
+
+
+/// \brief Loads OpenGL extensions return false if unsuccesfull
+bool
+GraphicsContextGLFW::loadExtensions()
+{
+
+  if( !gladLoadGLLoader((GLADloadproc) glfwGetProcAddress) )
+  {
+
+    return false;
+
+  }
+
+  return true;
+
+}
+

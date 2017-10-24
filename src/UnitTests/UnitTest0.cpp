@@ -201,15 +201,7 @@ TEST( UnitTest0, RenderTexture )
   //
   ASSERT_NE( 0, reinterpret_cast< size_t >( pWin ) );
 
-
-  // initialize glad
-  if( !gladLoadGLLoader((GLADloadproc) glfwGetProcAddress) )
-  {
-
-    glfwTerminate();
-    FAIL() << "Didn't initialize glad correctly" << std::endl;
-  }
-
+  ASSERT_TRUE( context.loadExtensions() );
 
 
   //

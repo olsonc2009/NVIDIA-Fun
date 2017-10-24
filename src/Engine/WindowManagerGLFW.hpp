@@ -12,7 +12,6 @@ struct GLFWwindow;
 /// \brief WindowManagerGLFW assumes that there is already a valid context
 ///        and manages window creation and usage
 /// \todo Pass in a window renderer for it to use to render to itself
-///
 class WindowManagerGLFW
 {
 
@@ -26,6 +25,7 @@ public:
   virtual bool finalize();
 
   /// \ creates a new window with the specified parameters
+  /// \todo Remove GLFWwindow return by reference as it is too specific to this implmentation
   virtual bool createWindow(
                             size_t &retID,
                             GLFWwindow*& pRetWin,
