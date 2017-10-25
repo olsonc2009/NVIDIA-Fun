@@ -28,10 +28,12 @@ namespace utility
                           std::string& outputString
                           );
 
+  /// \brief Generate vertices, texCoords, and indices that can be used for rendering a texture to the screen, by default flip the texture coordinates for correct visual display
   bool generateScreenModelPackage(
                                  std::vector< float >& vertexPosVec,
                                  std::vector< float >& texCoords,
-                                 std::vector< unsigned int >& indices
+                                 std::vector< unsigned int >& indices,
+                                 bool flipTexCoords = true
                                  );
 
 };

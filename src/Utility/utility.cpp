@@ -116,11 +116,12 @@ namespace utility
 
   }
 
-
+  /// \brief Generate vertices, texCoords, and indices that can be used for rendering a texture to the screen, by default flip the texture coordinates for correct visual display
   bool generateScreenModelPackage(
                                   std::vector< float >& vertexPosVec,
                                   std::vector< float >& texCoords,
-                                  std::vector< unsigned int >& indices
+                                  std::vector< unsigned int >& indices,
+                                  bool flipTexCoords
                                   )
   {
 
@@ -136,29 +137,82 @@ namespace utility
     vertexPosVec.push_back( -1.0f );
     vertexPosVec.push_back( -1.0f );
     vertexPosVec.push_back( 0.0f );
-    texCoords   .push_back( 0.0f );
-    texCoords   .push_back( 0.0f );
+
+    if( !flipTexCoords )
+    {
+
+      texCoords   .push_back( 0.0f );
+      texCoords   .push_back( 0.0f );
+
+    }
+    else
+    {
+
+      texCoords   .push_back( 0.0f );
+      texCoords   .push_back( 1.0f );
+
+    }
+
 
     // Point 1
     vertexPosVec.push_back( -1.0f );
     vertexPosVec.push_back( 1.0f );
     vertexPosVec.push_back( 0.0f );
-    texCoords   .push_back( 0.0f );
-    texCoords   .push_back( 1.0f );
+
+    if( !flipTexCoords )
+    {
+
+      texCoords   .push_back( 0.0f );
+      texCoords   .push_back( 1.0f );
+
+    }
+    else
+    {
+
+      texCoords   .push_back( 0.0f );
+      texCoords   .push_back( 0.0f );
+
+    }
 
     // Point 2
     vertexPosVec.push_back( 1.0f );
     vertexPosVec.push_back( 1.0f );
     vertexPosVec.push_back( 0.0f );
-    texCoords   .push_back( 1.0f );
-    texCoords   .push_back( 1.0f );
+
+    if( !flipTexCoords )
+    {
+
+      texCoords   .push_back( 1.0f );
+      texCoords   .push_back( 1.0f );
+
+    }
+    else
+    {
+
+      texCoords   .push_back( 1.0f );
+      texCoords   .push_back( 0.0f );
+
+    }
 
     // Point 3
     vertexPosVec.push_back( 1.0f );
     vertexPosVec.push_back( -1.0f );
     vertexPosVec.push_back( 0.0f );
-    texCoords   .push_back( 1.0f );
-    texCoords   .push_back( 0.0f );
+
+    if( !flipTexCoords )
+    {
+
+      texCoords   .push_back( 1.0f );
+      texCoords   .push_back( 0.0f );
+
+    }
+    else
+    {
+
+      texCoords   .push_back( 1.0f );
+      texCoords   .push_back( 1.0f );
+
+    }
 
     // Indices for drawing triangles
     indices.push_back( 0 );
