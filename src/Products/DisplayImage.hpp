@@ -60,6 +60,7 @@ private:
   std::string  imageFilename_;
   std::string  fileType_;
   bool         useImageSizeForWindowSize_;
+  std::string  shaderPath_;
 
   std::vector< unsigned char > image_;
   std::vector< float >         renderData_;

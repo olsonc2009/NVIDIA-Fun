@@ -231,7 +231,8 @@ WindowManagerGLFW::renderToWindow(
                                   const std::vector< float > data,
                                   const std::vector< unsigned int > dataDims,
                                   unsigned int numDataChannels,
-                                  RendererOGL* pRenderer
+                                  RendererOGL* pRenderer,
+                                  std::string shaderPath
                                   )
 {
 
@@ -389,8 +390,8 @@ WindowManagerGLFW::renderToWindow(
     // Add the indices to the package
     pModelPackage_->addIndices( indices );
 
-    shaderFilenames.push_back( "../src/UnitTests/testTexVert.glsl" );
-    shaderFilenames.push_back( "../src/UnitTests/testTexFrag.glsl" );
+    shaderFilenames.push_back( shaderPath + "/RenderToScreenVert.glsl" );
+    shaderFilenames.push_back( shaderPath + "/RenderToScreenFrag.glsl" );
 
     //
     // Add the shaders to the render package

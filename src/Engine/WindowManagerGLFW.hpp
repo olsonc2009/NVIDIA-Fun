@@ -62,7 +62,8 @@ public:
                               const std::vector< float > data,
                               const std::vector< unsigned int > dataDims,
                               unsigned int numDataChannels,
-                              RendererOGL *pRenderer
+                              RendererOGL *pRenderer,
+                              std::string shaderPath = "Resources/Shaders/"
                               );
   //virtual bool renderToWindow( const ModelPackage& modelPackage );
 

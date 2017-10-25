@@ -102,6 +102,7 @@ DisplayImage::reset()
   inputKeys_.push_back( "windowWidth"  );
   inputKeys_.push_back( "windowHeight" );
   inputKeys_.push_back( "fileType"     );
+  inputKeys_.push_back( "shaderPath"   );
 
   if( pRenderer_      == 0 )
   {
@@ -258,7 +259,8 @@ DisplayImage::renderLoop()
                                     renderData_,
                                     pModelPackage_->getTextureDims(),
                                     pModelPackage_->getTextureStride(),
-                                    pRenderer_
+                                    pRenderer_,
+                                    shaderPath_
                                     );
 
     // Swap buffers
@@ -687,6 +689,42 @@ DisplayImage::validatePropTree(
     }
 
   }
+
+  if( inputTree.count( "shaderPath" ) )
+  {
+
+    try
+    {
+
+      if( extractParameters )
+      {
+
+        shaderPath_ = inputTree.get< std::string >( "shaderPath" );
+
+      }
+
+    }
+    catch( pt::ptree_error & err )
+    {
+
+      std::cerr << "Error: " << err.what() << std::endl;
+
+    }
+
+
+  }
+  else
+  {
+
+    if( extractParameters )
+    {
+
+      shaderPath_ = "Resources/Shaders/";
+
+    }
+
+  }
+
 
   return true;
 

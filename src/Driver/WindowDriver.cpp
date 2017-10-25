@@ -139,6 +139,7 @@ void parseArgs( int argc, char* argv[] )
     ( "windowWidth", po::value< unsigned int >(), "Width of the display window" )
     ( "windowHeight", po::value< unsigned int >(), "Height of the display window" )
     ( "fileType", po::value< std::string >(), "Type of the file to display" )
+    ( "shaderPath", po::value< std::string >(), "Path of the shaders to use" )
     ;
 
   po::variables_map vm;
@@ -216,6 +217,16 @@ void parseArgs( int argc, char* argv[] )
     propTree_.put(
                   "fileType",
                   vm[ "fileType" ].as< std::string >()
+                  );
+
+  }
+
+  if( vm.find( "shaderPath" ) != vm.end() )
+  {
+
+    propTree_.put(
+                  "shaderPath",
+                  vm[ "shaderPath" ].as< std::string >()
                   );
 
   }
