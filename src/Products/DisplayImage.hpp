@@ -62,6 +62,10 @@ private:
   bool         useImageSizeForWindowSize_;
   std::string  shaderPath_;
 
+  unsigned int imageWidth_;
+  unsigned int imageHeight_;
+
+
   std::vector< unsigned char > image_;
   std::vector< float >         renderData_;
 

@@ -66,7 +66,7 @@ DisplayImage::reset()
   windowHeight_              = 0;
   imageFilename_             = "NOT_SPECIFIED";
   fileType_                  = "NOT_SPECIFIED";
-  useImageSizeForWindowSize_ = true;
+  useImageSizeForWindowSize_ = false;
 
   //
   // Reset the inputTree to a default state
@@ -304,6 +304,10 @@ DisplayImage::loadImage()
 
   }
 
+  imageWidth_    = image.width();
+  imageHeight_   = image.height();
+  imageChannels_ = 3;
+
   //boost::gil::const_view( image );
 
   image_.reserve( image.width() * image.height() * boost::gil::num_channels< boost::gil::rgb8_image_t >() );
@@ -420,8 +424,8 @@ DisplayImage::setupModelPackage()
                                       );
 
   // Create the necessary vector for imageSizeVec
-  imageSizeVec.push_back( windowWidth_ );
-  imageSizeVec.push_back( windowHeight_ );
+  imageSizeVec.push_back( imageWidth_ );
+  imageSizeVec.push_back( imageHeight_ );
 
   // Add the geometry
   pModelPackage_->addGeometry( vertexPosVec );
@@ -602,7 +606,7 @@ DisplayImage::validatePropTree(
 
         windowWidth_ = inputTree.get< unsigned int >( "windowWidth" );
 
-        if( windowHeight_ == 0 )
+        if( windowWidth_ == 0 )
         {
 
           useImageSizeForWindowSize_ = true;
