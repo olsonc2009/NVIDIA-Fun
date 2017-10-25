@@ -4,7 +4,7 @@
 
 #include <boost/gil/gil_all.hpp>
 #include <boost/gil/extension/io/png_io.hpp>
-
+#include <boost/foreach.hpp>
 
 #include "RendererOGL.hpp"
 #include "ModelPackage.hpp"
@@ -246,35 +246,20 @@ DisplayImage::renderLoop()
 {
 
   glClearColor( 0.0f, 0.0f, 0.4f, 0.0f );
-  glViewport( 0, 0, windowWidth_, windowHeight_ );
   // Do the rendeiring for now in a loop
   do
   {
 
     glClear( GL_COLOR_BUFFER_BIT );
-    //glViewport( 0, 0, 640, 480 );
 
-    pRenderer_->renderId( renderableIdx_ );
 
-    //
-    // Blit from the framebuffer to the screen
-    //
-    // glBindFramebuffer(
-    //                   GL_READ_FRAMEBUFFER,
-    //                   fbo
-    //                   );
-
-    // glBindFramebuffer(
-    //                   GL_DRAW_FRAMEBUFFER,
-    //                   0
-    //                   );
-
-    // glBlitFramebuffer(
-    //                   0, 0, 640, 480,
-    //                   0, 0, 640, 480,
-    //                   GL_COLOR_BUFFER_BIT,
-    //                   GL_LINEAR
-    //                   );
+    pWindowManager_->renderToWindow(
+                                    windowIdx_,
+                                    renderData_,
+                                    pModelPackage_->getTextureDims(),
+                                    pModelPackage_->getTextureStride(),
+                                    pRenderer_
+                                    );
 
     // Swap buffers
     pWindowManager_->swapBuffers( windowIdx_ );
@@ -319,31 +304,35 @@ DisplayImage::loadImage()
 
   //boost::gil::const_view( image );
 
-  image_.resize( image.width() * image.height() * boost::gil::num_channels< boost::gil::rgb8_image_t >() );
+  image_.reserve( image.width() * image.height() * boost::gil::num_channels< boost::gil::rgb8_image_t >() );
 
   // For each pixel insert into a storage bin
-  // boost::gil::for_each_pixel(
-  //                            boost::gil::const_view( image ),
-  //                            PixelInserter( &image_ )
-  //                            );
+  boost::gil::for_each_pixel(
+                             boost::gil::const_view( image ),
+                             PixelInserter( &image_ )
+                             );
 
   // Loop over all of the pixels in the image and push them into a vector
-  // for( size_t row = 0; row < image.height(); ++row )
+  //  for( size_t row = 0; row < image.height(); ++row )
   // {
 
-    for( size_t col = 0; col < image.width(); ++col )
-    {
+  //   for( size_t col = 0; col < image.width(); ++col )
+  //   {
 
-      //std::cout << ( unsigned int )image_[ ( row * image.width() + col ) * 3 + 2 ] << ", ";
-      // image_[ ( image.width() / 2 * image.height() + col ) * 3 + 0 ] = 0;
-      // image_[ ( image.width() / 2 * image.height() + col ) * 3 + 1 ] = 0;
-      // image_[ ( image.width() / 2 * image.height() + col ) * 3 + 2 ] = 1;
+  //     //std::cout << ( unsigned int )image_[ ( row * image.width() + col ) * 3 + 2 ] << ", ";
+  //     // image_[ ( image.width() / 2 * image.height() + col ) * 3 + 0 ] = 0;
+  //     // image_[ ( image.width() / 2 * image.height() + col ) * 3 + 1 ] = 0;
+  //     // image_[ ( image.width() / 2 * image.height() + col ) * 3 + 2 ] = 1;
 
-      image_[ ( image.height() / 2 * image.width() + col ) * 3 + 0 ] = 0;
-      image_[ ( image.height() / 2 * image.width() + col ) * 3 + 1 ] = 0;
-      image_[ ( image.height() / 2 * image.width() + col ) * 3 + 2 ] = 1;
+  //     image_[ ( image.height() / 2 * image.width() + col ) * 3 + 0 ] = 0;
+  //     image_[ ( image.height() / 2 * image.width() + col ) * 3 + 1 ] = 0;
+  //     image_[ ( image.height() / 2 * image.width() + col ) * 3 + 2 ] = 1;
 
-    }
+  //     // image_[ ( row * image.width() + col ) * 3 + 0 ] = 0;
+  //     // image_[ ( row * image.width() + col ) * 3 + 1 ] = 1;
+  //     // image_[ ( row * image.width() + col ) * 3 + 2 ] = 1;
+
+  //   }
 
   // }
 
@@ -448,6 +437,45 @@ DisplayImage::setupModelPackage()
 
   shaderFilenames.push_back( "../src/UnitTests/testTexVert.glsl" );
   shaderFilenames.push_back( "../src/UnitTests/testTexFrag.glsl" );
+
+  // Get a copy of the floating point data
+  renderData_ = pModelPackage_->getTexture();
+
+  /// \todo put in the minimum float value here
+  float max( -100000 );
+  float min( 100000 );
+
+  // Normalize the data based on the highest value found
+  for( size_t idx = 0; idx < renderData_.size(); ++idx )
+  {
+
+    if( renderData_[ idx ] > max )
+    {
+
+      max = renderData_[ idx ];
+
+    }
+
+    if( renderData_[ idx ] < min )
+    {
+
+      min = renderData_[ idx ];
+
+    }
+
+  }
+
+  if( max != 0 )
+  {
+
+    for( size_t idx = 0; idx < renderData_.size(); ++idx )
+    {
+
+      renderData_[ idx ] = renderData_[ idx ] / max;
+
+    }
+
+  }
 
   //
   // Add the shaders to the render package

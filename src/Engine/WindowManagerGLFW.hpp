@@ -3,8 +3,12 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 class GraphicsContextGLFW;
+class ModelPackage;
+class ScreenPackage;
+class RendererOGL;
 
 struct GLFWwindow;
 
@@ -12,6 +16,8 @@ struct GLFWwindow;
 /// \brief WindowManagerGLFW assumes that there is already a valid context
 ///        and manages window creation and usage
 /// \todo Pass in a window renderer for it to use to render to itself
+/// \todo Remove GLFWwindow from forward decleration list in header
+///
 class WindowManagerGLFW
 {
 
@@ -50,6 +56,15 @@ public:
   /// \brief get the window, returns null if it doesn't exist
   GLFWwindow* getWindow( size_t windowIdx );
 
+  /// \brief Render data which should have the dimensions dataDims to the screen, also assumes channel data is interleaved
+  virtual bool renderToWindow(
+                              size_t windowToRenderTo,
+                              const std::vector< float > data,
+                              const std::vector< unsigned int > dataDims,
+                              unsigned int numDataChannels,
+                              RendererOGL *pRenderer
+                              );
+  //virtual bool renderToWindow( const ModelPackage& modelPackage );
 
 protected:
 
@@ -57,6 +72,26 @@ protected:
   size_t nextWindowID_;
 
   GraphicsContextGLFW *pGraphicsContext_;
+
+  bool initializedRenderingPackage_;
+
+  ModelPackage* pModelPackage_;
+
+  //
+  // Initial size related stuff
+  //
+  unsigned int renderWidth_;
+  unsigned int renderHeight_;
+  unsigned int renderChannels_;
+
+  std::vector< float > renderData_;
+
+  // OpenGL Stuff that has to move
+  /// \todo Move this OpenGL stuff to RendererOGL
+  unsigned int fbo_;
+  unsigned int fboTex_;
+
+  size_t renderableIdx_;
 
 };
 

@@ -12,9 +12,9 @@ void main()
 
   color = vec3( 0, 0, 0 );
 
-  color.rgb = vec3( 0, 0, 0 );
-  color.rg = uvCoords.xy;
+  //color.rgb = vec3( 0, 0, 0 );
+  //color.rg = uvCoords.xy;
 
-  //color.rgb = texture( myTextureSampler, uvCoords ).rgb;
+  color.rgb = texture( myTextureSampler, uvCoords ).rgb;
 
 }

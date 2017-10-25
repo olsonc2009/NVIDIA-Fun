@@ -453,7 +453,7 @@ TEST( UnitTest0, RenderTexture )
   //              GL_STATIC_DRAW
   //              );
 
-  std::cout << "Staring renderer loop" << std::endl;
+  std::cout << "Starting renderer loop" << std::endl;
 
 
   {

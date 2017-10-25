@@ -62,6 +62,7 @@ private:
   bool         useImageSizeForWindowSize_;
 
   std::vector< unsigned char > image_;
+  std::vector< float >         renderData_;
 
   RendererOGL*         pRenderer_;
   ModelPackage*        pModelPackage_;
@@ -72,6 +73,7 @@ private:
 
   size_t renderableIdx_;
   size_t windowIdx_;
+
 
 };
 
