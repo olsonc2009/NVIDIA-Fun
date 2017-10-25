@@ -11,6 +11,7 @@ class ScreenPackage;
 class RendererOGL;
 
 struct GLFWwindow;
+struct WindowAttributesGLFW;
 
 ///
 /// \brief WindowManagerGLFW assumes that there is already a valid context
@@ -35,8 +36,8 @@ public:
   virtual bool createWindow(
                             size_t &retID,
                             GLFWwindow*& pRetWin,
-                            const size_t winHeight = 640,
-                            const size_t winWidth = 480,
+                            const size_t winWidth = 640,
+                            const size_t winHeight = 480,
                             const std::string winTitle = "NoTitle",
                             const int openGlMajorVersion = 3,
                             const int openGlMinorVersion = 3
@@ -69,7 +70,7 @@ public:
 
 protected:
 
-  std::map< size_t, GLFWwindow* > idToWindowMap_;
+  std::map< size_t, WindowAttributesGLFW* > idToWindowMap_;
   size_t nextWindowID_;
 
   GraphicsContextGLFW *pGraphicsContext_;

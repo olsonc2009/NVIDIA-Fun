@@ -10,6 +10,19 @@
 #include "RendererOGL.hpp"
 #include "utility.hpp"
 
+
+
+/// \brief Structure to keep track of attributes of a window
+struct WindowAttributesGLFW
+{
+
+  unsigned int windowHeight_;
+  unsigned int windowWidth_;
+  GLFWwindow* pWindow_;
+
+};
+
+
 /// \brief Constructor, does nothing until initialize
 WindowManagerGLFW::WindowManagerGLFW( GraphicsContextGLFW* pGraphicsContext )
   : nextWindowID_               ( 0 )
@@ -37,8 +50,8 @@ bool
 WindowManagerGLFW::createWindow(
                                 size_t &retID,
                                 GLFWwindow*& pRetWin,
-                                const size_t winHeight,
                                 const size_t winWidth,
+                                const size_t winHeight,
                                 const std::string winTitle,
                                 const int openGlMajorVersion,
                                 const int openGlMinorVersion
@@ -69,8 +82,8 @@ WindowManagerGLFW::createWindow(
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
   GLFWwindow* pWindow = glfwCreateWindow(
-                                         winHeight,
                                          winWidth,
+                                         winHeight,
                                          winTitle.c_str(),
                                          NULL,  // GLFWmonitor* monitor
                                          NULL   // GLFWwindow* share
@@ -82,7 +95,14 @@ WindowManagerGLFW::createWindow(
     //
     // Add the window to our map and assign the return variables
     //
-    idToWindowMap_[ nextWindowID_ ] = pWindow;
+    WindowAttributesGLFW *pWinAtts = new WindowAttributesGLFW();
+
+    pWinAtts->pWindow_      = pWindow;
+    pWinAtts->windowHeight_ = winHeight;
+    pWinAtts->windowWidth_  = winWidth;
+
+    idToWindowMap_[ nextWindowID_ ] = pWinAtts;
+
     retID = nextWindowID_;
 
     if( &pRetWin != 0 )
@@ -124,7 +144,7 @@ WindowManagerGLFW::grabWindow( size_t windowIdx )
   if( idToWindowMap_.find( windowIdx ) != idToWindowMap_.end() )
   {
 
-    glfwMakeContextCurrent( idToWindowMap_[ windowIdx ] );
+    glfwMakeContextCurrent( idToWindowMap_[ windowIdx ]->pWindow_ );
 
   }
   else
@@ -146,10 +166,12 @@ WindowManagerGLFW::finalize()
   //
   // Destroy any windows we have tracked
   //
-  for( std::map< size_t, GLFWwindow* >::iterator iter = idToWindowMap_.begin(); iter != idToWindowMap_.end(); ++iter )
+  for( std::map< size_t, WindowAttributesGLFW* >::iterator iter = idToWindowMap_.begin(); iter != idToWindowMap_.end(); ++iter )
     {
 
-      glfwDestroyWindow( iter->second );
+      glfwDestroyWindow( iter->second->pWindow_ );
+
+      delete iter->second;
 
     }
 
@@ -207,12 +229,12 @@ GLFWwindow*
 WindowManagerGLFW::getWindow( size_t windowIdx )
 {
 
-  std::map< size_t, GLFWwindow* >::iterator iter = idToWindowMap_.find( windowIdx );
+  std::map< size_t, WindowAttributesGLFW* >::iterator iter = idToWindowMap_.find( windowIdx );
 
   if( iter != idToWindowMap_.end() )
   {
 
-    return iter->second;
+    return iter->second->pWindow_;
 
   }
 
@@ -237,6 +259,19 @@ WindowManagerGLFW::renderToWindow(
 {
 
   bool ret( false );
+
+  // Make sure the window exists
+  std::map< size_t, WindowAttributesGLFW* >::iterator iter = idToWindowMap_.find( windowToRenderTo );
+
+  if( iter == idToWindowMap_.end() )
+  {
+
+    std::cerr << "WindowManagerGLFW could not find window ID " << windowToRenderTo << std::endl;
+    return false;
+
+  }
+
+  WindowAttributesGLFW* pWinAtts = iter->second;
 
   // Check for valid dimension sizes
   if( dataDims.size() != 2 )
@@ -461,8 +496,8 @@ WindowManagerGLFW::renderToWindow(
                     );
 
   glBlitFramebuffer(
-                    0, 0, 640, 480,
-                    0, 0, 640, 480,
+                    0, 0, renderWidth_, renderHeight_,
+                    0, 0, pWinAtts->windowWidth_, pWinAtts->windowHeight_,
                     GL_COLOR_BUFFER_BIT,
                     GL_LINEAR
                     );
