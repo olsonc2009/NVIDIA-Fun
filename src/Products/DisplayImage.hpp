@@ -70,7 +70,6 @@ private:
 
   RendererOGL*         pRenderer_;
   WindowManagerGLFW*   pWindowManager_;
-  GraphicsContextGLFW* pGraphicsContext_;
   GLFWwindow*          pWin_;
 
   size_t renderableIdx_;

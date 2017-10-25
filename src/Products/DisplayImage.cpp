@@ -36,7 +36,6 @@ struct PixelInserter
 DisplayImage::DisplayImage()
   : pRenderer_        ( 0 )
   , pWindowManager_   ( 0 )
-  , pGraphicsContext_ ( 0 )
 {
 
   reset();
@@ -113,14 +112,6 @@ DisplayImage::reset()
 
     delete pWindowManager_;
     pWindowManager_ = 0;
-
-  }
-
-  if( pGraphicsContext_ )
-  {
-
-    delete pGraphicsContext_;
-    pGraphicsContext_ = 0;
 
   }
 
@@ -335,22 +326,10 @@ DisplayImage::setupWindowForDisplay()
 {
 
 
-
-  pGraphicsContext_ = new GraphicsContextGLFW();
   pRenderer_        = new RendererOGL();
-  pWindowManager_   = new WindowManagerGLFW( pGraphicsContext_ );
+  pWindowManager_   = new WindowManagerGLFW();
 
   bool success( false );
-
-  success = pGraphicsContext_->initialize();
-
-  if( !success )
-  {
-
-    return false;
-
-  }
-
 
   success = pWindowManager_->createWindow(
                                           windowIdx_,
@@ -365,16 +344,6 @@ DisplayImage::setupWindowForDisplay()
     return false;
   }
 
-
-  success = pGraphicsContext_->loadExtensions();
-
-  if( !success )
-  {
-
-    return false;
-
-  }
-
   return success;
 
 }
@@ -382,6 +351,7 @@ DisplayImage::setupWindowForDisplay()
 
 
 /// \brief Create the normalized renderData_ from the loaded in image_ data
+/// \todo Move finding min/max and other stat calculations to utility
 bool
 DisplayImage::setupImageForRendering()
 {
@@ -394,7 +364,7 @@ DisplayImage::setupImageForRendering()
   float max( -100000 );
   float min( 100000 );
 
-  // Normalize the data based on the highest value found
+  // Find the min and max of the image
   for( size_t idx = 0; idx < image_.size(); ++idx )
   {
 
@@ -414,6 +384,7 @@ DisplayImage::setupImageForRendering()
 
   }
 
+  // Normalize the image for rendering
   if( max != 0 )
   {
 

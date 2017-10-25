@@ -125,6 +125,20 @@ WindowManagerGLFW::createWindow(
       glfwSwapInterval( 0 );
     }
 
+    // Make sure the context has loaded extensions
+    if( !pGraphicsContext_->extensionsLoaded() )
+    {
+
+      if( !pGraphicsContext_->loadExtensions() )
+      {
+
+        std::cerr << "GraphicsContext extensions weren't loaded" << std::endl;
+        return false;
+
+      }
+
+    }
+
     return true;
 
   }
@@ -295,6 +309,20 @@ WindowManagerGLFW::renderToWindow(
   {
 
     std::cerr << "WindowManagerGLFW does not support anything but 3 channel data to render" << std::endl;
+
+  }
+
+  // Make sure the context has loaded extensions
+  if( !pGraphicsContext_->extensionsLoaded() )
+  {
+
+    if( !pGraphicsContext_->loadExtensions() )
+    {
+
+      std::cerr << "GraphicsContext extensions weren't loaded" << std::endl;
+      return false;
+
+    }
 
   }
 
