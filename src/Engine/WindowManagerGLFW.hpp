@@ -70,6 +70,13 @@ public:
   /// \brief Check for ESCAPE button or window exit
   virtual bool checkForDefaultExitConditions( size_t windowIdx );
 
+  /// \brief Retrieve the data from wherever it was rendered
+  virtual bool retrieveRenderedData(
+                                    std::vector< float >&        outRenderedDataVec,
+                                    std::vector< unsigned int >& outDataDimsVec,
+                                    unsigned int&                outDataChannels
+                                    );
+
 protected:
 
   std::map< size_t, WindowAttributesGLFW* > idToWindowMap_;

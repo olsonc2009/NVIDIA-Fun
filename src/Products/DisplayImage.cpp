@@ -371,7 +371,7 @@ DisplayImage::setupImageForRendering()
 
     }
 
-    if( renderData_[ idx ] < min )
+    if( image_[ idx ] < min )
     {
 
       min = static_cast< float >( image_[ idx ] );

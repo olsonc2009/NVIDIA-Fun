@@ -368,7 +368,7 @@ WindowManagerGLFW::renderToWindow(
     glTexImage2D(
                  GL_TEXTURE_2D,
                  0,
-                 GL_RGB,
+                 GL_RGB32F,
                  renderWidth_,
                  renderHeight_,
                  0,
@@ -560,5 +560,68 @@ WindowManagerGLFW::checkForDefaultExitConditions( size_t windowIdx )
           glfwGetKey( iter->second->pWindow_, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
           glfwWindowShouldClose( iter->second->pWindow_ ) == 0
           );
+
+}
+
+
+/// \brief Read whatever is on the rendered fbo currently
+/// \todo Support other than 3 channels
+bool
+WindowManagerGLFW::retrieveRenderedData(
+                                        std::vector< float >&        outRenderedDataVec,
+                                        std::vector< unsigned int >& outDataDimsVec,
+                                        unsigned int&                outDataChannels
+                                        )
+{
+
+  // Set the size of the output vector
+  std::vector< float > readData( renderWidth_ * renderHeight_ * renderChannels_, -1.0 );
+
+  outRenderedDataVec.resize( renderWidth_ * renderHeight_ * renderChannels_ );
+
+  // Set the dimensions
+  outDataDimsVec.resize( 2 );
+  outDataDimsVec[ 0 ] = renderWidth_;
+  outDataDimsVec[ 1 ] = renderHeight_;
+
+  // Set the channels in the data
+  outDataChannels = renderChannels_;
+
+  // Bind the FBO that we rendered to for reading
+  glBindFramebuffer(
+                    GL_READ_FRAMEBUFFER,
+                    fbo_
+                    );
+
+
+  // Read the full fbo which is the rendered width / height
+  glReadPixels(
+               0, 0,
+               renderWidth_, renderHeight_,
+               GL_RGB,
+               GL_FLOAT,
+               &readData[ 0 ]
+               );
+
+  //
+  // Flip the verticalness of the buffer so we get the right output
+  //
+  for( size_t row = 0; row < renderHeight_; ++row )
+  {
+
+    size_t insertRow( renderHeight_ - 1 - row );
+
+    size_t readStartIdx ( row * renderWidth_ * renderChannels_ );
+    size_t writeStartIdx( insertRow * renderWidth_ * renderChannels_ );
+
+    std::copy(
+              readData.begin() + readStartIdx,
+              readData.begin() + readStartIdx + renderWidth_ * renderChannels_,
+              outRenderedDataVec.begin() + writeStartIdx
+              );
+
+  }
+
+  return true;
 
 }

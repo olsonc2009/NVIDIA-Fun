@@ -120,7 +120,7 @@ RendererOGL::initializeRenderable(
     glTexImage2D(
                  GL_TEXTURE_2D,
                  0,
-                 GL_RGB,
+                 GL_RGB32F,
                  texDims[ 0 ],
                  texDims[ 1 ],
                  0,
