@@ -381,7 +381,7 @@ DisplayImage::setupWindowForDisplay()
 
 
 
-/// \brief Given everything that is loaded into the class memory setup a Model Package for rendering
+/// \brief Create the normalized renderData_ from the loaded in image_ data
 bool
 DisplayImage::setupImageForRendering()
 {
