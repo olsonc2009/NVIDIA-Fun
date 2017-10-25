@@ -181,13 +181,13 @@ WindowManagerGLFW::finalize()
   // Destroy any windows we have tracked
   //
   for( std::map< size_t, WindowAttributesGLFW* >::iterator iter = idToWindowMap_.begin(); iter != idToWindowMap_.end(); ++iter )
-    {
+  {
 
-      glfwDestroyWindow( iter->second->pWindow_ );
+    glfwDestroyWindow( iter->second->pWindow_ );
 
-      delete iter->second;
+    delete iter->second;
 
-    }
+  }
 
   //
   // Clear the map now that we are done with it
@@ -532,3 +532,33 @@ WindowManagerGLFW::renderToWindow(
 
 }
 
+
+/// \brief Poll for ESCAPE button or window exit
+bool
+WindowManagerGLFW::checkForDefaultExitConditions( size_t windowIdx )
+{
+
+  // Grab the window
+
+  std::map< size_t, WindowAttributesGLFW* >::iterator iter = idToWindowMap_.find( windowIdx );
+
+  if( iter == idToWindowMap_.end() )
+  {
+
+    std::cerr << "Can't check for exit conditions because " << windowIdx << " does not exist" << std::endl;
+    return false;
+
+  }
+
+
+  // Poll for any glfw events
+  glfwPollEvents();
+
+
+  // Check if the default buttons have been pressed
+  return (
+          glfwGetKey( iter->second->pWindow_, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
+          glfwWindowShouldClose( iter->second->pWindow_ ) == 0
+          );
+
+}

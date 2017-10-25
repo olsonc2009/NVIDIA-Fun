@@ -67,6 +67,9 @@ public:
                               std::string shaderPath = "Resources/Shaders/"
                               );
 
+  /// \brief Check for ESCAPE button or window exit
+  virtual bool checkForDefaultExitConditions( size_t windowIdx );
+
 protected:
 
   std::map< size_t, WindowAttributesGLFW* > idToWindowMap_;

@@ -235,13 +235,13 @@ DisplayImage::renderLoop()
     // Swap buffers
     pWindowManager_->swapBuffers( windowIdx_ );
 
-    //glfwSwapBuffers( pWin_ );
-    glfwPollEvents();
+    // glfwPollEvents();
 
   }
   while(
-        glfwGetKey( pWin_, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
-        glfwWindowShouldClose( pWin_ ) == 0
+        pWindowManager_->checkForDefaultExitConditions( windowIdx_ )
+        // glfwGetKey( pWin_, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
+        // glfwWindowShouldClose( pWin_ ) == 0
         );
 
 }
