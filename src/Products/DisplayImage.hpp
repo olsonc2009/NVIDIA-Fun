@@ -45,7 +45,7 @@ private:
                         );
 
   bool loadImage();
-  bool setupModelPackage();
+  bool setupImageForRendering();
   bool setupWindowForDisplay();
   bool renderLoop();
 

@@ -192,7 +192,7 @@ DisplayImage::displayImage()
   //
   // Setup the model package
   //
-  success = setupModelPackage();
+  success = setupImageForRendering();
 
   if( !success )
   {
@@ -271,7 +271,7 @@ DisplayImage::loadImage()
   boost::gil::rgb8_image_t image;
   boost::gil::png_read_and_convert_image( imageFilename_.c_str(), image );
 
-  std::cout << "Width, Height, Channels = " << image.width() << ", " << image.height() << ", " << boost::gil::num_channels< boost::gil::rgb8_image_t >() << std::endl;
+  //std::cout << "Width, Height, Channels = " << image.width() << ", " << image.height() << ", " << boost::gil::num_channels< boost::gil::rgb8_image_t >() << std::endl;
 
   if( useImageSizeForWindowSize_ )
   {
@@ -383,7 +383,7 @@ DisplayImage::setupWindowForDisplay()
 
 /// \brief Given everything that is loaded into the class memory setup a Model Package for rendering
 bool
-DisplayImage::setupModelPackage()
+DisplayImage::setupImageForRendering()
 {
 
   // Get a copy of the floating point data
