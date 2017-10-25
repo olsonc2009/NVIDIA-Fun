@@ -83,47 +83,6 @@ int main( int argc, char* argv[] )
 
   return 0;
 
-  // bool success( false );
-
-  // GraphicsContextGLFW graphicsContext;
-  // WindowManagerGLFW   windowManager;
-
-  // success = graphicsContext.initialize();
-
-  // if( !success )
-  // {
-
-  //   std::cerr << "Did not succesfully initialize graphics context" << std::endl;
-  //   return -1;
-
-  // }
-
-  // size_t windowIdx;
-  // GLFWwindow* pWin;
-
-  // success = windowManager.createWindow( windowIdx, pWin );
-
-  // if( !success )
-  // {
-
-  //   std::cerr << "Did not successfully create a window" << std::endl;
-  //   return -2;
-
-  // }
-
-  // success = graphicsContext.loadExtensions();
-
-  // if( !success )
-  // {
-
-  //   std::cerr << "Did not succesfully load extensions" << std::endl;
-
-  // }
-
-
-  // // Load Extensions
-
-  // std::cout << "Exiting the program succesfully" << std::endl;
 }
 
 

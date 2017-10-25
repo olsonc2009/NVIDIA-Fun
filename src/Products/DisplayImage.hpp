@@ -6,8 +6,6 @@
 
 #include <boost/property_tree/ptree.hpp>
 
-class ModelPackage;
-class RenderableOGL;
 class RendererOGL;
 class WindowManagerGLFW;
 class GraphicsContextGLFW;
@@ -65,13 +63,12 @@ private:
   unsigned int imageWidth_;
   unsigned int imageHeight_;
 
+  std::vector< unsigned int > imageDims_;
 
   std::vector< unsigned char > image_;
   std::vector< float >         renderData_;
 
   RendererOGL*         pRenderer_;
-  ModelPackage*        pModelPackage_;
-  RenderableOGL*       pRenderableOGL_;
   WindowManagerGLFW*   pWindowManager_;
   GraphicsContextGLFW* pGraphicsContext_;
   GLFWwindow*          pWin_;

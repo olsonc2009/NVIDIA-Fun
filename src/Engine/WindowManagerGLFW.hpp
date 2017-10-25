@@ -66,7 +66,6 @@ public:
                               RendererOGL *pRenderer,
                               std::string shaderPath = "Resources/Shaders/"
                               );
-  //virtual bool renderToWindow( const ModelPackage& modelPackage );
 
 protected:
 

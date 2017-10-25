@@ -7,8 +7,6 @@
 #include <boost/foreach.hpp>
 
 #include "RendererOGL.hpp"
-#include "ModelPackage.hpp"
-#include "RenderableOGL.hpp"
 #include "WindowManagerGLFW.hpp"
 #include "GraphicsContextGLFW.hpp"
 #include "utility.hpp"
@@ -37,8 +35,6 @@ struct PixelInserter
 /// \brief Ctor, calls reset
 DisplayImage::DisplayImage()
   : pRenderer_        ( 0 )
-  , pModelPackage_    ( 0 )
-  , pRenderableOGL_   ( 0 )
   , pWindowManager_   ( 0 )
   , pGraphicsContext_ ( 0 )
 {
@@ -109,24 +105,6 @@ DisplayImage::reset()
 
     delete pRenderer_;
     pRenderer_ = 0;
-
-  }
-
-
-  if( pModelPackage_  == 0 )
-  {
-
-    delete pModelPackage_;
-    pModelPackage_ = 0;
-
-  }
-
-
-  if( pRenderableOGL_ == 0 )
-  {
-
-    delete pRenderableOGL_;
-    pRenderableOGL_ = 0;
 
   }
 
@@ -257,8 +235,8 @@ DisplayImage::renderLoop()
     pWindowManager_->renderToWindow(
                                     windowIdx_,
                                     renderData_,
-                                    pModelPackage_->getTextureDims(),
-                                    pModelPackage_->getTextureStride(),
+                                    imageDims_,
+                                    imageChannels_,
                                     pRenderer_,
                                     shaderPath_
                                     );
@@ -307,6 +285,10 @@ DisplayImage::loadImage()
   imageWidth_    = image.width();
   imageHeight_   = image.height();
   imageChannels_ = 3;
+
+  imageDims_.clear();
+  imageDims_.push_back( imageWidth_ );
+  imageDims_.push_back( imageHeight_ );
 
   //boost::gil::const_view( image );
 
@@ -404,68 +386,29 @@ bool
 DisplayImage::setupModelPackage()
 {
 
-  bool ret( false );
-
-  pModelPackage_  = new ModelPackage();
-
-  pRenderableOGL_ = new RenderableOGL();
-
-  std::vector< float >        vertexPosVec;
-  std::vector< float >        texCoords;
-  std::vector< unsigned int > indices;
-  std::vector< unsigned int > imageSizeVec;
-  std::vector< std::string >  shaderFilenames;
-
-  // Generate what we can for the render package
-  utility::generateScreenModelPackage(
-                                      vertexPosVec,
-                                      texCoords,
-                                      indices
-                                      );
-
-  // Create the necessary vector for imageSizeVec
-  imageSizeVec.push_back( imageWidth_ );
-  imageSizeVec.push_back( imageHeight_ );
-
-  // Add the geometry
-  pModelPackage_->addGeometry( vertexPosVec );
-
-  // Add the texture to the package
-  pModelPackage_->addTexture(
-                             image_,
-                             texCoords,
-                             imageSizeVec,
-                             imageChannels_
-                             );
-
-  // Add the indices to the package
-  pModelPackage_->addIndices( indices );
-
-  shaderFilenames.push_back( "../src/UnitTests/testTexVert.glsl" );
-  shaderFilenames.push_back( "../src/UnitTests/testTexFrag.glsl" );
-
   // Get a copy of the floating point data
-  renderData_ = pModelPackage_->getTexture();
+  renderData_.resize( image_.size() );
+
 
   /// \todo put in the minimum float value here
   float max( -100000 );
   float min( 100000 );
 
   // Normalize the data based on the highest value found
-  for( size_t idx = 0; idx < renderData_.size(); ++idx )
+  for( size_t idx = 0; idx < image_.size(); ++idx )
   {
 
-    if( renderData_[ idx ] > max )
+    if( static_cast< float >( image_[ idx ] ) > max )
     {
 
-      max = renderData_[ idx ];
+      max = static_cast< float >( image_[ idx ] );
 
     }
 
     if( renderData_[ idx ] < min )
     {
 
-      min = renderData_[ idx ];
+      min = static_cast< float >( image_[ idx ] );
 
     }
 
@@ -477,38 +420,11 @@ DisplayImage::setupModelPackage()
     for( size_t idx = 0; idx < renderData_.size(); ++idx )
     {
 
-      renderData_[ idx ] = renderData_[ idx ] / max;
+      renderData_[ idx ] = static_cast< float >( image_[ idx ] ) / max;
 
     }
 
   }
-
-  //
-  // Add the shaders to the render package
-  //
-  ret = pModelPackage_->addRendererFilenames( shaderFilenames );
-
-  // Return if bad
-  if( !ret )
-  {
-
-    return ret;
-
-  }
-
-  //
-  // Create the renderable
-  //
-  ret = pRenderer_->initializeRenderable( *pModelPackage_, renderableIdx_ );
-
-  // Return if bad
-  if( !ret )
-  {
-
-    return ret;
-
-  }
-
 
   return true;
 
