@@ -194,6 +194,25 @@ WindowManagerGLFW::finalize()
   //
   idToWindowMap_.clear();
 
+  //
+  // Clean up the opengl stuff
+  //
+  if( initializedRenderingPackage_ )
+  {
+
+    glDeleteBuffers( 1, &fbo_ );
+    fbo_ = 0;
+
+    glDeleteTextures( 1, &fboTex_ );
+    fboTex_ = 0;
+
+    renderableIdx_ = 0;
+
+    initializedRenderingPackage_ = false;
+
+  }
+
+
   return true;
 
 }
