@@ -120,11 +120,11 @@ RendererOGL::initializeRenderable(
     glTexImage2D(
                  GL_TEXTURE_2D,
                  0,
-                 GL_RGBA,
-                 texDims[ 1 ],
+                 GL_RGB32F,
                  texDims[ 0 ],
+                 texDims[ 1 ],
                  0,
-                 GL_RGBA,
+                 GL_RGB,
                  GL_FLOAT,
                  &texture[ 0 ]
                  );
@@ -225,7 +225,7 @@ RendererOGL::renderId( size_t renderableIdx )
 
   // Enable the texture coordinates
   glEnableVertexAttribArray( 1 );
-  glBindBuffer( GL_ARRAY_BUFFER, pRenderable->textureID_ );
+  glBindBuffer( GL_ARRAY_BUFFER, pRenderable->texCoordBufferID_ );
 
   glVertexAttribPointer(
                        1,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.

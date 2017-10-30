@@ -13,6 +13,7 @@ set( GLFW_DIR glfw )
 set( SRC_DIR ${CMAKE_CURRENT_LIST_DIR}/src )
 set( ENGINE_DIR ${SRC_DIR}/Engine )
 set( UTIL_DIR ${SRC_DIR}/Utility )
+set( PRODUCT_DIR ${SRC_DIR}/Products )
 
 #
 # Find gtest to make sure the unit tests are rolling
