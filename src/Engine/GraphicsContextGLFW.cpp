@@ -5,7 +5,8 @@
 
 /// \brief Constructor, doesn't do anything but set default values
 GraphicsContextGLFW::GraphicsContextGLFW()
-: initialized_( false )
+  : initialized_      ( false )
+  , extensionsLoaded_ ( false )
 {
 
 }
@@ -90,5 +91,34 @@ GraphicsContextGLFW::isInitialized()
 {
 
   return initialized_;
+
+}
+
+
+/// \brief Loads OpenGL extensions return false if unsuccesfull
+bool
+GraphicsContextGLFW::loadExtensions()
+{
+
+  if( !gladLoadGLLoader((GLADloadproc) glfwGetProcAddress) )
+  {
+
+    return false;
+
+  }
+
+  extensionsLoaded_ = true;
+
+  return true;
+
+}
+
+
+/// \brief Return whether the extensions have been loaded
+bool
+GraphicsContextGLFW::extensionsLoaded()
+{
+
+  return extensionsLoaded_;
 
 }

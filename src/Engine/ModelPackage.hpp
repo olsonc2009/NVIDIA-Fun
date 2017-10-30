@@ -125,7 +125,14 @@ ModelPackage::addTexture(
   {
 
     tex_.resize( texture.size() );
-    std::copy( texture.begin(), texture.end(), tex_.begin() );
+
+    for( size_t idx = 0; idx < tex_.size(); ++idx )
+    {
+
+      tex_[ idx ] = static_cast< float >( texture[ idx ] );
+
+    }
+    //std::copy( texture.begin(), texture.end(), tex_.begin() );
 
     // Set everything we need
     texCoords_     = textureCoords;

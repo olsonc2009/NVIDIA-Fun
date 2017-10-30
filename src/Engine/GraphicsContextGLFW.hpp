@@ -21,11 +21,15 @@ public:
   /// \brief If we've been initialized destroy the glfw context cleanly
   virtual bool finalize();
 
+  virtual bool loadExtensions();
+
   bool isInitialized();
+  bool extensionsLoaded();
 
 protected:
 
   bool initialized_;
+  bool extensionsLoaded_;
 
 };
 

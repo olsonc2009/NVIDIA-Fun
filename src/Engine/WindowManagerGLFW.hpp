@@ -3,23 +3,28 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
+class GraphicsContextGLFW;
+class ModelPackage;
+class ScreenPackage;
+class RendererOGL;
 
-class WindowRendererOGL;
+struct GLFWwindow;
+struct WindowAttributesGLFW;
 
 ///
 /// \brief WindowManagerGLFW assumes that there is already a valid context
 ///        and manages window creation and usage
 /// \todo Pass in a window renderer for it to use to render to itself
+/// \todo Remove GLFWwindow from forward decleration list in header
 ///
 class WindowManagerGLFW
 {
 
 public:
 
-  WindowManagerGLFW( WindowRendererOGL* pWinRenderer = 0 );
+  WindowManagerGLFW( GraphicsContextGLFW* pGraphicsContext = 0 );
 
   virtual ~WindowManagerGLFW();
 
@@ -27,11 +32,12 @@ public:
   virtual bool finalize();
 
   /// \ creates a new window with the specified parameters
+  /// \todo Remove GLFWwindow return by reference as it is too specific to this implmentation
   virtual bool createWindow(
                             size_t &retID,
                             GLFWwindow*& pRetWin,
-                            const size_t winHeight = 640,
-                            const size_t winWidth = 480,
+                            const size_t winWidth = 640,
+                            const size_t winHeight = 480,
                             const std::string winTitle = "NoTitle",
                             const int openGlMajorVersion = 3,
                             const int openGlMinorVersion = 3
@@ -51,12 +57,52 @@ public:
   /// \brief get the window, returns null if it doesn't exist
   GLFWwindow* getWindow( size_t windowIdx );
 
+  /// \brief Render data which should have the dimensions dataDims to the screen, also assumes channel data is interleaved
+  virtual bool renderToWindow(
+                              size_t windowToRenderTo,
+                              const std::vector< float > data,
+                              const std::vector< unsigned int > dataDims,
+                              unsigned int numDataChannels,
+                              RendererOGL *pRenderer,
+                              std::string shaderPath = "Resources/Shaders/"
+                              );
+
+  /// \brief Check for ESCAPE button or window exit
+  virtual bool checkForDefaultExitConditions( size_t windowIdx );
+
+  /// \brief Retrieve the data from wherever it was rendered
+  virtual bool retrieveRenderedData(
+                                    std::vector< float >&        outRenderedDataVec,
+                                    std::vector< unsigned int >& outDataDimsVec,
+                                    unsigned int&                outDataChannels
+                                    );
+
 protected:
 
-  std::map< size_t, GLFWwindow* > idToWindowMap_;
+  std::map< size_t, WindowAttributesGLFW* > idToWindowMap_;
   size_t nextWindowID_;
 
-  WindowRendererOGL *pWinRenderer_;
+  GraphicsContextGLFW *pGraphicsContext_;
+
+  bool initializedRenderingPackage_;
+
+  ModelPackage* pModelPackage_;
+
+  //
+  // Initial size related stuff
+  //
+  unsigned int renderWidth_;
+  unsigned int renderHeight_;
+  unsigned int renderChannels_;
+
+  std::vector< float > renderData_;
+
+  // OpenGL Stuff that has to move
+  /// \todo Move this OpenGL stuff to RendererOGL
+  unsigned int fbo_;
+  unsigned int fboTex_;
+
+  size_t renderableIdx_;
 
 };
 
